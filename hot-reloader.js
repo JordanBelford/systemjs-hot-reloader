@@ -34,10 +34,10 @@ class HotReloader extends Emitter {
     this.socket.on('connect', () => {
       d('hot reload connected to watcher on ', backendUrl)
       this.socket.emit('identification', navigator.userAgent)
-      this.socket.emit('package.json', function (pjson) {
-        // self.pjson = pjson // maybe needed in the future?
-        self.jspmConfigFile = pjson.jspm.configFile || 'config.js'
-      })
+      // this.socket.emit('package.json', function (pjson) {
+      //   // self.pjson = pjson // maybe needed in the future?
+      //   self.jspmConfigFile = pjson.jspm.configFile || 'config.js'
+      // })
     })
     this.socket.on('reload', () => {
       d('whole page reload requested')
