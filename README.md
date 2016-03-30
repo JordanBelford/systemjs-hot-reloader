@@ -11,11 +11,12 @@ jspm i github:capaj/systemjs-hot-reloader
 ```
 
 ## Usage
+Recommended usage with JSPM 0.17.0 and up is described here by [@guybedford](https://github.com/guybedford/) himself: http://jspm.io/0.17-beta-guide/hot-reloading.html
 
+If using 0.16.x, read the rest here: 
 Place the following JavaScript into `index.html`, __before__ you import your application files. When `jspm-hot-reloader` is imported, it requires that you set `System.trace = true` before first System.import.
 
 ```javascript
-
 if (location.origin.match(/localhost/)) { 
   System.trace = true
   System.import('capaj/systemjs-hot-reloader').then(function(HotReloader){
@@ -42,10 +43,11 @@ Boilerplate set up for hot reloading modules you can fork and use with 3 simple 
 
 ## Why
 
-We're javascript programmers. We should not need to bundle our apps for development. Many folks dislike JSPM because of how slow it is. JSPM deserves another shot, because it can be faster, more robust and more reliable than most alternatives. This simple package proves it. Especially for larger codebases, SPAs and such-reliable hot reloadable modules are a crucial development tool. Webpack hot reloading tools are hacky-they might preserve component state, but they sacrifice robustness. Very often a change in a source code doesn't manifestate after webpacks hot reload. This will never happen with module hot reload.
+We're javascript programmers. We should not need to bundle our apps for development. Many folks dislike JSPM because of how slow it is. JSPM deserves another shot, because it can be faster, more robust and more reliable than most alternatives. This simple package proves it. Especially for larger codebases, SPAs and such-reliable hot reloadable modules are a necessray for meaningful feedback loop. Webpack hot reloading tools are hacky-very often a change in a source code doesn't manifestate after webpacks hot reload. This will never happen with module hot reload, because we're properly rerunning depency tree.
 
 ## Preserving state
 If you want some state to persist through hot reload, just put it in a module separate from the component. I personally use [POJOs with observation](https://github.com/mweststrate/mobservable), but you are free to use any kind of value store, as long as it sits in separate module from your reloaded component.
+Another way to do this is by adding a [simple getHotReloadStore utility](https://gist.github.com/peteruithoven/b43a6d2cd6c3d2c1a923).
 
 ## How
 When a change event is emitted on socket.io, we match a module in System._loader.moduleRecords.
@@ -64,6 +66,14 @@ export function __unload(){
 }
 ```
 This is needed for example for [Angular](https://github.com/capaj/NG6-starter/blob/eb988ef00685390618b5dad57635ce80c6d52680/client/app/app.js#L42), which needs clean DOM every time it bootstraps.
+
+This is also needed for some React components, like the Redux Provider and React Router. A crude way to force reloading of React components: 
+``` javascript
+export function __unload() {
+  // force unload React components
+  ReactDOM.unmountComponentAtNode(DOMNode);	// your container node
+}
+```
 
 ## Credit
 Most of the credit for this awesome engineering feat should go to [Guy Bedford](https://github.com/guybedford). He paved me a way, I simply followed it.
